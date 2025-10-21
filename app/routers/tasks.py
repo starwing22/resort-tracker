@@ -1,5 +1,5 @@
 from typing import List
-from datetime import datetime
+from datetime import UTC, datetime
 from fastapi import APIRouter, HTTPException, Query
 from sqlmodel import select
 from app.db import get_session
@@ -50,7 +50,7 @@ def update_task(task_id: int, payload: TaskUpdate):
         data = payload.model_dump(exclude_unset=True)
         for k, v in data.items():
             setattr(task, k, v)
-        task.updated_at = datetime.utcnow()
+        task.updated_at = datetime.now(UTC)
         s.add(task)
         s.commit()
         s.refresh(task)
