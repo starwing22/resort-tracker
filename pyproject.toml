@@ -10,8 +10,11 @@ dependencies = [
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
+filterwarnings = [
+  "ignore:Accessing argon2.__version__:DeprecationWarning"]
 
 [tool.ruff]
 line-length = 88
 lint.select = ["E", "F", "I"]
 exclude = ["venv", "migrations", "__pycache__"]
+
