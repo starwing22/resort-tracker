@@ -8,6 +8,7 @@ from app.schemas import TaskCreate, TaskUpdate, TaskRead
 
 router = APIRouter(prefix="/tasks", tags=["tasks"])
 
+
 @router.get("", response_model=List[TaskRead])
 def list_tasks(
     status: str | None = Query(default=None),
@@ -24,6 +25,7 @@ def list_tasks(
             stmt = stmt.where(Task.category == category)
         return s.exec(stmt).all()
 
+
 @router.post("", response_model=TaskRead, status_code=201)
 def create_task(payload: TaskCreate):
     with get_session() as s:
@@ -33,6 +35,7 @@ def create_task(payload: TaskCreate):
         s.refresh(task)
         return task
 
+
 @router.get("/{task_id}", response_model=TaskRead)
 def get_task(task_id: int):
     with get_session() as s:
@@ -40,6 +43,7 @@ def get_task(task_id: int):
         if not task:
             raise HTTPException(404, "Task not found")
         return task
+
 
 @router.patch("/{task_id}", response_model=TaskRead)
 def update_task(task_id: int, payload: TaskUpdate):
@@ -55,6 +59,7 @@ def update_task(task_id: int, payload: TaskUpdate):
         s.commit()
         s.refresh(task)
         return task
+
 
 @router.delete("/{task_id}", status_code=204)
 def delete_task(task_id: int):

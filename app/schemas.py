@@ -2,9 +2,10 @@ from typing import Optional, Literal
 from datetime import date, datetime
 from pydantic import BaseModel
 
-Status = Literal["open","in_progress","completed"]
-Priority = Literal["low","medium","high"]
-Category = Literal["engineering","housekeeping","front_office","other"]
+Status = Literal["open", "in_progress", "completed"]
+Priority = Literal["low", "medium", "high"]
+Category = Literal["engineering", "housekeeping", "front_office", "other"]
+
 
 class TaskBase(BaseModel):
     title: str
@@ -15,8 +16,10 @@ class TaskBase(BaseModel):
     category: Category = "engineering"
     due_date: Optional[date] = None
 
+
 class TaskCreate(TaskBase):
     pass
+
 
 class TaskUpdate(BaseModel):
     title: Optional[str] = None
@@ -26,6 +29,7 @@ class TaskUpdate(BaseModel):
     priority: Optional[Priority] = None
     category: Optional[Category] = None
     due_date: Optional[date] = None
+
 
 class TaskRead(TaskBase):
     id: int
