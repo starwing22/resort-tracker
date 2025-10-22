@@ -1,13 +1,42 @@
-import os, tempfile, pytest
+# tests/conftest.py
+import os
+import pytest
 from fastapi.testclient import TestClient
-from sqlmodel import create_engine
+from sqlmodel import SQLModel
 from app.main import app
-from app import db
+from app.db import engine
+from app.settings import settings
 
-@pytest.fixture(scope="function")
+print("\n=== 🧪 Pytest setup ===")
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_test_env():
+    """
+    Ensure the app runs in test mode and uses .env.test.
+    """
+    os.environ["ENV"] = "test"
+    # If you want to verify it's using the test DB, uncomment below:
+    # from app.settings import settings
+    # print("🧪 Using DB:", settings.DATABASE_URL)
+    yield
+
+@pytest.fixture(scope="session", autouse=True)
+def create_test_db():
+    """
+    Initialize the test database schema once before all tests.
+    Drops & recreates all tables to ensure a clean test environment.
+    """
+    SQLModel.metadata.drop_all(engine)
+    SQLModel.metadata.create_all(engine)
+    yield
+    # optional cleanup after all tests
+    SQLModel.metadata.drop_all(engine)
+
+
+@pytest.fixture(scope="session")
 def client():
-    tmp = tempfile.NamedTemporaryFile(delete=False)
-    db.engine = create_engine(f"sqlite:///{tmp.name}", connect_args={"check_same_thread": False})
-    with TestClient(app) as c:  # runs lifespan -> init_db()
+    """
+    Provides a fresh TestClient for each test.
+    """
+    with TestClient(app) as c:
         yield c
-    os.unlink(tmp.name)
